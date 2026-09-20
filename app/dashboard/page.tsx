@@ -46,7 +46,7 @@ export default function Dashboard() {
       {loading ? (
         <p className="text-slate">Loading…</p>
       ) : products.length === 0 ? (
-        <p className="text-slate">You haven't claimed a rank yet.</p>
+        <p className="text-slate">You haven&apos;t claimed a rank yet.</p>
       ) : (
         <ul className="divide-y divide-white/10 border-y border-white/10">
           {products.map((p) => (
