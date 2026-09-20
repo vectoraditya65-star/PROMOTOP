@@ -1,0 +1,77 @@
+// Promo Top — database schema
+// Swapped provider to "postgresql" for Supabase connection
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+// Real accounts, not just an email typed in at checkout. Passwords are
+// bcrypt hashes only — the plaintext is never stored or logged.
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  role         Role      @default(USER)
+  banned       Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  products     Product[]
+  bids         Bid[]
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  slug      String    @unique
+  name      String
+  products  Product[]
+  createdAt DateTime  @default(now())
+}
+
+model Product {
+  id              String   @id @default(cuid())
+  name            String
+  description     String
+  url             String
+  handle          String?
+  imageUrl        String?
+  categoryId      String
+  category        Category @relation(fields: [categoryId], references: [id])
+  currentBidCents Int      @default(0)
+  clicks          Int      @default(0)
+  ownerId         String
+  owner           User     @relation(fields: [ownerId], references: [id])
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  bids            Bid[]
+
+  @@index([categoryId, currentBidCents])
+}
+
+// Every successful payment is recorded here as an immutable audit trail.
+// Ranks are always derived from confirmed Bid rows, never edited in place,
+// so the leaderboard history can be reconstructed and disputes can be checked.
+model Bid {
+  id                    String   @id @default(cuid())
+  productId             String
+  product               Product  @relation(fields: [productId], references: [id])
+  amountCents           Int
+  stripeSessionId       String   @unique
+  stripePaymentIntentId String?
+  status                String   @default("pending") // pending | paid | failed | refunded
+  bidderId              String
+  bidder                User     @relation(fields: [bidderId], references: [id])
+  createdAt             DateTime @default(now())
+
+  @@index([productId, status])
+}
