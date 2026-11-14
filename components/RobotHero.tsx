@@ -3,7 +3,9 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useSession, signOut } from "next-auth/react";
+import Link from "next/link";
 import { moneyWhole } from "@/lib/format";
+import SubmitProjectModal from "./SubmitProjectModal";
 
 type AnalyticsData = {
   totalProducts: number;
@@ -18,7 +20,6 @@ type Category = {
   name: string;
 };
 
-// Fallback categories matching your inspiration reference
 const DEFAULT_CATEGORIES: Category[] = [
   { slug: "leaderboards", name: "🔥 Leaderboards" },
   { slug: "seo-ai-visibility", name: "🔍 SEO & AI Visibility" },
@@ -49,8 +50,8 @@ export default function RobotHero({
     productsAddedToday: 0,
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddProjectModalOpen, setIsAddProjectModalOpen] = useState(false);
 
-  // Blinking robot animation effect
   useEffect(() => {
     const interval = setInterval(() => {
       setIsBlinking(true);
@@ -60,7 +61,6 @@ export default function RobotHero({
     return () => clearInterval(interval);
   }, []);
 
-  // Fetch real analytics data
   useEffect(() => {
     fetch("/api/analytics")
       .then((res) => res.json())
@@ -72,7 +72,6 @@ export default function RobotHero({
       .catch(() => {});
   }, []);
 
-  // Fetch categories from API or keep fallbacks
   useEffect(() => {
     fetch("/api/categories")
       .then((res) => res.json())
@@ -94,7 +93,6 @@ export default function RobotHero({
 
   return (
     <section className="w-full bg-[#f4f6f3] text-neutral-900 py-6 px-6 border-b border-neutral-200 font-sans">
-      {/* Top Header Row */}
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 pb-6 mb-6 border-b border-neutral-200/60">
         <div className="flex flex-wrap items-center gap-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-neutral-200 text-xs text-neutral-600 shadow-sm">
@@ -105,7 +103,7 @@ export default function RobotHero({
           </div>
 
           <a
-            href="mailto:vectoraditya65@gmail.com"
+            href="mailto:support@promotop.app"
             className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-medium text-emerald-700 hover:bg-emerald-100 transition-colors shadow-sm"
           >
             <svg
@@ -121,22 +119,39 @@ export default function RobotHero({
                 d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
               />
             </svg>
-            Help & Support: vectoraditya65@gmail.com
+            Help & Support: support@promotop.app
           </a>
         </div>
 
         <div className="flex items-center gap-3">
           {status === "authenticated" ? (
-            <div className="flex items-center gap-3 bg-white px-3 py-1.5 rounded-full border border-neutral-200 shadow-sm">
-              <span className="text-xs font-medium text-neutral-700">
-                {session.user?.email}
-              </span>
-              <button
-                onClick={() => signOut()}
-                className="text-xs font-semibold text-red-600 hover:text-red-700 transition-colors"
-              >
-                Sign Out
-              </button>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2.5 bg-white px-4 py-2 rounded-2xl border border-neutral-200 shadow-sm">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-neutral-700">
+                  {session.user?.email}
+                </span>
+                <button
+                  onClick={() => signOut()}
+                  className="text-xs font-semibold text-red-600 hover:text-red-700 transition-colors"
+                >
+                  Sign Out
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2 pt-1 sm:pt-0 sm:border-l sm:border-neutral-200 sm:pl-2.5">
+                <Link
+                  href="/dashboard"
+                  className="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-700 hover:bg-slate-200 transition"
+                >
+                  Dashboard
+                </Link>
+                <button
+                  onClick={() => setIsAddProjectModalOpen(true)}
+                  className="rounded-lg bg-emerald-600 px-2.5 py-1 text-xs font-bold text-white hover:bg-emerald-500 shadow-sm transition"
+                >
+                  + Add Project
+                </button>
+              </div>
             </div>
           ) : (
             <div className="flex items-center gap-2">
@@ -157,7 +172,6 @@ export default function RobotHero({
         </div>
       </div>
 
-      {/* Main Grid: Green Title & White Robot */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center mb-6">
         <div className="lg:col-span-5 flex flex-col items-center lg:items-start text-center lg:text-left">
           <h1 className="text-5xl sm:text-7xl font-black tracking-tighter text-emerald-600 mb-6 uppercase">
@@ -273,7 +287,6 @@ export default function RobotHero({
         </div>
       </div>
 
-      {/* CLICKABLE CATEGORIES NAVIGATION BAR */}
       <div className="max-w-7xl mx-auto pt-4 border-t border-neutral-200">
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
           <button
@@ -303,7 +316,6 @@ export default function RobotHero({
         </div>
       </div>
 
-      {/* Interactive Bidding Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-neutral-200">
@@ -336,6 +348,11 @@ export default function RobotHero({
           </div>
         </div>
       )}
+
+      <SubmitProjectModal
+        isOpen={isAddProjectModalOpen}
+        onClose={() => setIsAddProjectModalOpen(false)}
+      />
     </section>
   );
 }

@@ -3,8 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { moneyWhole } from "@/lib/format";
 import RobotHero from "@/components/RobotHero";
+import SubmitProjectModal from "@/components/SubmitProjectModal";
 
 type Product = {
   id: string;
@@ -25,13 +27,14 @@ export default function Home() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Ticker items for moving headline animation
   const tickerItems = [
     "🚀 PROMOTOP Live: Ranked listings updated in real-time!",
     "🏆 Top Spot Bid: Claim #1 rank spot across categories!",
     "🔥 New claims and bid updates in real time",
-    "⚡ Contact Support: vectoraditya65@gmail.com",
+    "⚡ Contact Support: support@promotop.app",
   ];
 
   // Fetch categories from database
@@ -49,7 +52,7 @@ export default function Home() {
   }, []);
 
   // Fetch products based on active category
-  useEffect(() => {
+  const fetchProducts = () => {
     setLoading(true);
     const url =
       activeCategory === "all"
@@ -69,6 +72,10 @@ export default function Home() {
         setProducts([]);
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    fetchProducts();
   }, [activeCategory]);
 
   return (
@@ -136,13 +143,28 @@ export default function Home() {
           {/* Top User Status Header */}
           <div className="flex items-center gap-3 shrink-0">
             {status === "authenticated" ? (
-              <div className="flex items-center gap-3 bg-white px-3 py-1.5 rounded-full border border-neutral-200 shadow-sm">
+              <div className="flex items-center gap-2.5 bg-white px-3.5 py-1.5 rounded-full border border-neutral-200 shadow-sm">
                 <span className="text-xs font-medium text-neutral-700">
                   {session.user?.email}
                 </span>
+
+                <Link
+                  href="/dashboard"
+                  className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700 hover:bg-slate-200 transition"
+                >
+                  Dashboard
+                </Link>
+
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="rounded-full bg-emerald-600 px-3 py-1 text-xs font-bold text-white hover:bg-emerald-500 shadow-sm transition"
+                >
+                  + Add Project
+                </button>
+
                 <button
                   onClick={() => signOut()}
-                  className="text-xs font-semibold text-red-600 hover:text-red-700 transition-colors"
+                  className="text-xs font-semibold text-red-600 hover:text-red-700 transition-colors pl-1"
                 >
                   Sign Out
                 </button>
@@ -226,6 +248,13 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      {/* Project Submission Modal */}
+      <SubmitProjectModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={fetchProducts}
+      />
     </main>
   );
 }
