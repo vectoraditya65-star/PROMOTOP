@@ -47,7 +47,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       {/* Top Banner Header */}
-      <header className="sticky top-0 z-40 border-b border-emerald-100 bg-white/80 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-emerald-100 bg-white/85 backdrop-blur-md">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-5 py-4">
           <Link href="/" className="text-2xl font-black tracking-tight text-emerald-600">
             PROMOTOP
