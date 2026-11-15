@@ -187,4 +187,176 @@ export default function RobotHero({
               xmlns="http://www.w3.org/2000/svg"
               className="drop-shadow-lg"
             >
-              <rect x="40
+              <rect x="40" y="20" width="180" height="130" rx="65" fill="#FFFFFF" stroke="#E2E8F0" strokeWidth="4"/>
+              <rect x="60" y="40" width="140" height="90" rx="45" fill="#0F172A" />
+
+              <motion.ellipse
+                cx="95"
+                cy="85"
+                rx="18"
+                ry={isBlinking ? "2" : "18"}
+                fill="#38BDF8"
+                transition={{ duration: 0.1 }}
+              />
+              <motion.ellipse
+                cx="165"
+                cy="85"
+                rx="18"
+                ry={isBlinking ? "2" : "18"}
+                fill="#38BDF8"
+                transition={{ duration: 0.1 }}
+              />
+
+              <rect x="70" y="155" width="120" height="100" rx="30" fill="#FFFFFF" stroke="#E2E8F0" strokeWidth="4"/>
+              <circle cx="130" cy="195" r="16" fill="#10B981" />
+
+              <rect x="35" y="165" width="24" height="60" rx="12" fill="#E2E8F0" />
+
+              <motion.g
+                style={{ transformOrigin: "205px 175px" }}
+                initial={{ rotate: 0 }}
+                animate={{
+                  rotate: [0, -145, -120, -150, -120, -150, 0],
+                }}
+                transition={{
+                  duration: 3.2,
+                  ease: "easeInOut",
+                  repeat: Infinity,
+                  repeatDelay: 2,
+                }}
+              >
+                <rect x="200" y="165" width="24" height="65" rx="12" fill="#E2E8F0" />
+                <circle cx="212" cy="235" r="12" fill="#38BDF8" />
+              </motion.g>
+            </svg>
+
+            <div className="w-40 h-3 bg-neutral-300/60 rounded-full blur-sm mt-1"></div>
+          </div>
+        </div>
+
+        <div className="lg:col-span-7 space-y-4">
+          <div className="bg-white border border-neutral-200 rounded-2xl p-6 shadow-sm">
+            <h2 className="text-2xl font-bold text-neutral-900 mb-2">
+              Leaderboard & Rank Bidding
+            </h2>
+            <p className="text-neutral-600 text-sm">
+              Claim top visibility on PROMOTOP. Bid higher than the top listing to instantly take the #1 rank spot.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="bg-white border border-neutral-200 p-5 rounded-2xl shadow-sm">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="h-2 w-2 rounded-full bg-emerald-500"></span>
+                <span className="text-xs text-neutral-500 font-medium">Total Listings</span>
+              </div>
+              <p className="text-2xl font-bold text-neutral-900">
+                {stats.totalProducts}
+              </p>
+            </div>
+
+            <div className="bg-white border border-neutral-200 p-5 rounded-2xl shadow-sm">
+              <div className="text-xs text-neutral-500 font-medium mb-1">Total Volume</div>
+              <p className="text-2xl font-bold text-neutral-900">
+                {moneyWhole(stats.totalVolumeCents)}
+              </p>
+            </div>
+
+            <div className="bg-white border border-neutral-200 p-5 rounded-2xl shadow-sm">
+              <div className="text-xs text-neutral-500 font-medium mb-1">Current #1 Bid</div>
+              <p className="text-2xl font-bold text-neutral-900">
+                {moneyWhole(stats.highestBidCents)}
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-white border border-neutral-200 p-4 rounded-2xl flex flex-wrap items-center justify-between gap-4 shadow-sm">
+            <div>
+              <span className="text-xs text-neutral-400 uppercase tracking-wider block">Rank #1 Target</span>
+              <span className="text-lg font-bold text-emerald-600">
+                {moneyWhole(stats.highestBidCents + 100)} or higher
+              </span>
+            </div>
+            <button
+              onClick={handleBidClick}
+              className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl transition-colors shadow-sm"
+            >
+              {status === "authenticated" ? "Bid for #1 Rank Spot" : "Sign In to Bid"}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto pt-4 border-t border-neutral-200">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          <button
+            onClick={() => onSelectCategory?.("all")}
+            className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all shadow-sm ${
+              activeCategory === "all"
+                ? "bg-emerald-600 text-white"
+                : "bg-white text-neutral-700 hover:bg-neutral-100 border border-neutral-200"
+            }`}
+          >
+            🌐 All
+          </button>
+
+          {categories.map((cat) => (
+            <button
+              key={cat.slug}
+              onClick={() => onSelectCategory?.(cat.slug)}
+              className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all shadow-sm ${
+                activeCategory === cat.slug
+                  ? "bg-emerald-600 text-white"
+                  : "bg-white text-neutral-700 hover:bg-neutral-100 border border-neutral-200"
+              }`}
+            >
+              {cat.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl border border-neutral-200">
+            <h3 className="text-xl font-bold text-neutral-900 mb-2">Claim Rank #1</h3>
+            <p className="text-sm text-neutral-600 mb-4">
+              Enter your bid amount. Must be higher than current highest bid ({moneyWhole(stats.highestBidCents)}).
+            </p>
+            <input
+              type="number"
+              placeholder="Enter bid amount in USD"
+              className="w-full px-4 py-2 border border-neutral-300 rounded-xl mb-4 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            />
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="px-4 py-2 text-sm text-neutral-600 hover:text-neutral-900"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  alert("Bid submitted successfully!");
+                  setIsModalOpen(false);
+                }}
+                className="px-5 py-2 bg-emerald-600 text-white text-sm font-semibold rounded-xl hover:bg-emerald-700"
+              >
+                Submit Bid
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <SubmitProjectModal
+        isOpen={isAddProjectModalOpen}
+        onClose={() => setIsAddProjectModalOpen(false)}
+        onSuccess={() => {
+          setIsAddProjectModalOpen(false);
+          window.location.reload();
+        }}
+      />
+    </section>
+  );
+}
