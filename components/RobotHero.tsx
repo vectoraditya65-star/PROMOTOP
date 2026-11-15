@@ -352,6 +352,10 @@ export default function RobotHero({
       <SubmitProjectModal
         isOpen={isAddProjectModalOpen}
         onClose={() => setIsAddProjectModalOpen(false)}
+        onSuccess={() => {
+          setIsAddProjectModalOpen(false);
+          window.location.reload();
+        }}
       />
     </section>
   );
